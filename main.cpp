@@ -1291,3 +1291,175 @@ int main() {
 
     return 0;
 }
+
+// Adding and Searching in Binary Search Tree:
+// Create a program that allows users to build a binary search tree by adding nodes, and then search for a specific value in the tree.
+
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* createNode(int value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->left = newNode->right = nullptr;
+    return newNode;
+}
+
+Node* insert(Node* root, int value) {
+    if (root == nullptr) {
+        return createNode(value);
+    }
+
+    if (value < root->data) {
+        root->left = insert(root->left, value);
+    } else if (value > root->data) {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
+}
+
+bool search(Node* root, int value) {
+    if (root == nullptr) {
+        return false;
+    }
+
+    if (root->data == value) {
+        return true;
+    } else if (value < root->data) {
+        return search(root->left, value);
+    } else {
+        return search(root->right, value);
+    }
+}
+
+int main() {
+    Node* root = nullptr;
+    root = insert(root, 10);
+    insert(root, 5);
+    insert(root, 15);
+    insert(root, 3);
+    insert(root, 7);
+
+    cout << "Enter a value to search: ";
+    int value;
+    cin >> value;
+
+    if (search(root, value)) {
+        cout << value << " found in the tree.\n";
+    } else {
+        cout << value << " not found in the tree.\n";
+    }
+
+    return 0;
+}
+
+
+// Deletion from Binary Search Tree:
+// Develop a program where users can insert nodes into a binary search tree and then delete a specific value from the tree.
+
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* createNode(int value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->left = newNode->right = nullptr;
+    return newNode;
+}
+
+Node* insert(Node* root, int value) {
+    if (root == nullptr) {
+        return createNode(value);
+    }
+
+    if (value < root->data) {
+        root->left = insert(root->left, value);
+    } else if (value > root->data) {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
+}
+
+Node* minValueNode(Node* node) {
+    Node* current = node;
+    while (current && current->left != nullptr) {
+        current = current->left;
+    }
+    return current;
+}
+
+Node* deleteNode(Node* root, int value) {
+    if (root == nullptr) {
+        return root;
+    }
+
+    if (value < root->data) {
+        root->left = deleteNode(root->left, value);
+    } else if (value > root->data) {
+        root->right = deleteNode(root->right, value);
+    } else {
+        if (root->left == nullptr) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == nullptr) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        Node* temp = minValueNode(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+    return root;
+}
+
+void inorder(Node* root) {
+    if (root != nullptr) {
+        inorder(root->left);
+        cout << root->data << " ";
+        inorder(root->right);
+    }
+}
+
+int main() {
+    Node* root = nullptr;
+    root = insert(root, 50);
+    insert(root, 30);
+    insert(root, 20);
+    insert(root, 40);
+    insert(root, 70);
+    insert(root, 60);
+    insert(root, 80);
+
+    cout << "Inorder traversal before deletion: ";
+    inorder(root);
+    cout << endl;
+
+    int key;
+    cout << "Enter the value to be deleted: ";
+    cin >> key;
+
+    root = deleteNode(root, key);
+
+    cout << "Inorder traversal after deletion: ";
+    inorder(root);
+    cout << endl;
+
+    return 0;
+}
