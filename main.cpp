@@ -211,3 +211,115 @@ bool is_magic(int matrix[][3], int size)
 
     return true;
 }
+
+
+
+// 1. *Patient Management System*: Implement a linked list to manage patient records in a hospital. Each node should store patient ID, name, and age. Implement functions to:
+//    - Add a new patient to the end of the list.
+//    - Remove a patient by ID.
+//    - Search for a patient by name.
+//    - Print all patient records.
+
+class PatientManagementSystem
+{
+private:
+    Node *headNode;
+    Node *currentNode;
+    int size;
+
+public:
+    PatientManagementSystem();
+    ~PatientManagementSystem();
+    void addPatient(int id, string name, int age);
+    void removePatient(int id);
+    void searchPatient(string name);
+    void printAllPatients();
+};
+
+PatientManagementSystem::PatientManagementSystem() { size = 0, headNode = nullptr, currentNode = nullptr; }
+PatientManagementSystem::~PatientManagementSystem() { delete headNode, delete currentNode; }
+
+void PatientManagementSystem::addPatient(int id, string name, int age)
+{
+    Node *newNode = new Node(id, name, age);
+    if (headNode == nullptr)
+    {
+        headNode = newNode;
+    }
+    else
+    {
+        currentNode = headNode;
+        while (currentNode->getNextNode() != nullptr)
+        {
+            currentNode = currentNode->getNextNode();
+        }
+        currentNode->setNextNode(newNode);
+        newNode->setPrevNode(currentNode);
+    }
+    size++;
+    cout << "Patient successfully added\n";
+}
+
+void PatientManagementSystem::removePatient(int id)
+{
+    currentNode = headNode;
+    while (currentNode != nullptr)
+    {
+        if (currentNode->getId() == id)
+        {
+            if (currentNode == headNode)
+            {
+                headNode = currentNode->getNextNode();
+            }
+
+            if (currentNode->getNextNode() != nullptr)
+            {
+                currentNode->getNextNode()->setPrevNode(currentNode->getPrevNode());
+            }
+
+            if (currentNode->getPrevNode() != nullptr)
+            {
+                currentNode->getPrevNode()->setNextNode(currentNode->getNextNode());
+            }
+
+            delete currentNode;
+            size--;
+            cout << "Patient removed successfully\n";
+            return;
+        }
+
+        currentNode = currentNode->getNextNode();
+    }
+}
+
+void PatientManagementSystem::searchPatient(string name)
+{
+    currentNode = headNode;
+    while (currentNode != nullptr)
+    {
+        if (currentNode->getName() == name)
+        {
+            currentNode->displayPatient();
+            return;
+        }
+        currentNode = currentNode->getNextNode();
+    }
+    cout << "Patient not found\n";
+}
+
+void PatientManagementSystem::printAllPatients()
+{
+    if (headNode == nullptr)
+    {
+        cout << "No patient found\n";
+    }
+    else
+    {
+        currentNode = headNode;
+        while (currentNode != nullptr)
+        {
+            currentNode->displayPatient();
+            currentNode = currentNode->getNextNode();
+        }
+    }
+}
