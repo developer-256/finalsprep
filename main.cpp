@@ -214,7 +214,7 @@ bool is_magic(int matrix[][3], int size)
 
 
 
-// 1. *Patient Management System*: Implement a linked list to manage patient records in a hospital. Each node should store patient ID, name, and age. Implement functions to:
+// 1. *Patient Management System*: Implement a doubly linked list to manage patient records in a hospital. Each node should store patient ID, name, and age. Implement functions to:
 //    - Add a new patient to the end of the list.
 //    - Remove a patient by ID.
 //    - Search for a patient by name.
@@ -322,4 +322,972 @@ void PatientManagementSystem::printAllPatients()
             currentNode = currentNode->getNextNode();
         }
     }
+}
+
+// Student Attendance System: Use a circular linked list to keep track of students' attendance. Each node should store student ID, name, and attendance status (Present/Absent). Implement functions to:
+//    - Mark a student as present or absent.
+//    - Remove a student's attendance record.
+//    - Display the attendance of all students.
+//    - Count the number of students present.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class StudentNode {
+public:
+    int id;
+    string name;
+    bool isPresent;
+    StudentNode* next;
+    StudentNode* prev;
+
+    StudentNode(int id, string name, bool isPresent)
+        : id(id), name(name), isPresent(isPresent), next(this), prev(this) {}
+};
+
+class AttendanceSystem {
+private:
+    StudentNode* head;
+    int size;
+
+public:
+    AttendanceSystem() : head(nullptr), size(0) {}
+
+    ~AttendanceSystem() {
+        while (size > 0) {
+            removeStudent(head->id);
+        }
+    }
+
+    void markAttendance(int id, string name, bool isPresent) {
+        StudentNode* newNode = new StudentNode(id, name, isPresent);
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            StudentNode* tail = head->prev;
+            tail->next = newNode;
+            newNode->prev = tail;
+            newNode->next = head;
+            head->prev = newNode;
+        }
+        size++;
+        cout << "Attendance marked for student: " << name << endl;
+    }
+
+    void removeStudent(int id) {
+        if (head == nullptr) return;
+
+        StudentNode* current = head;
+        do {
+            if (current->id == id) {
+                if (current == head) {
+                    if (head->next == head) {
+                        delete head;
+                        head = nullptr;
+                    } else {
+                        StudentNode* tail = head->prev;
+                        head = head->next;
+                        tail->next = head;
+                        head->prev = tail;
+                        delete current;
+                    }
+                } else {
+                    current->prev->next = current->next;
+                    current->next->prev = current->prev;
+                    delete current;
+                }
+                size--;
+                cout << "Student with ID " << id << " removed from attendance." << endl;
+                return;
+            }
+            current = current->next;
+        } while (current != head);
+    }
+
+    void displayAttendance() {
+        if (head == nullptr) {
+            cout << "No student attendance records found." << endl;
+            return;
+        }
+
+        StudentNode* current = head;
+        do {
+            cout << "ID: " << current->id << ", Name: " << current->name
+                 << ", Attendance: " << (current->isPresent ? "Present" : "Absent") << endl;
+            current = current->next;
+        } while (current != head);
+    }
+
+    int countPresentStudents() {
+        if (head == nullptr) return 0;
+
+        int count = 0;
+        StudentNode* current = head;
+        do {
+            if (current->isPresent) count++;
+            current = current->next;
+        } while (current != head);
+
+        return count;
+    }
+};
+
+int main() {
+    AttendanceSystem attendanceSystem;
+
+    attendanceSystem.markAttendance(1, "Alice", true);
+    attendanceSystem.markAttendance(2, "Bob", false);
+    attendanceSystem.markAttendance(3, "Charlie", true);
+
+    cout << "\nDisplaying all student attendance records:" << endl;
+    attendanceSystem.displayAttendance();
+
+    cout << "\nNumber of students present: " << attendanceSystem.countPresentStudents() << endl;
+
+    attendanceSystem.removeStudent(2);
+
+    cout << "\nDisplaying all student attendance records after removing a student:" << endl;
+    attendanceSystem.displayAttendance();
+
+    return 0;
+}
+
+
+// 3. Library Book Management: Create a singly linked list to manage books in a library. Each node should store book ID, title, and author. Implement functions to:
+//    - Add a new book to the start of the list.
+//    - Remove a book by title.
+//    - Search for a book by author.
+//    - Print all books in the library.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class BookNode {
+public:
+    int id;
+    string title;
+    string author;
+    BookNode* next;
+
+    BookNode(int id, string title, string author)
+        : id(id), title(title), author(author), next(nullptr) {}
+};
+
+class Library {
+private:
+    BookNode* head;
+    int size;
+
+public:
+    Library() : head(nullptr), size(0) {}
+
+    ~Library() {
+        while (head != nullptr) {
+            BookNode* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void addBook(int id, string title, string author) {
+        BookNode* newBook = new BookNode(id, title, author);
+        newBook->next = head;
+        head = newBook;
+        size++;
+        cout << "Book added: " << title << " by " << author << endl;
+    }
+
+    void removeBook(string title) {
+        if (head == nullptr) {
+            cout << "Book not found: " << title << endl;
+            return;
+        }
+
+        if (head->title == title) {
+            BookNode* temp = head;
+            head = head->next;
+            delete temp;
+            size--;
+            cout << "Book removed: " << title << endl;
+            return;
+        }
+
+        BookNode* current = head;
+        while (current->next != nullptr && current->next->title != title) {
+            current = current->next;
+        }
+
+        if (current->next == nullptr) {
+            cout << "Book not found: " << title << endl;
+        } else {
+            BookNode* temp = current->next;
+            current->next = current->next->next;
+            delete temp;
+            size--;
+            cout << "Book removed: " << title << endl;
+        }
+    }
+
+    void searchBookByAuthor(string author) {
+        BookNode* current = head;
+        bool found = false;
+        while (current != nullptr) {
+            if (current->author == author) {
+                cout << "Book found: " << current->title << " by " << author << endl;
+                found = true;
+            }
+            current = current->next;
+        }
+        if (!found) {
+            cout << "No books found by author: " << author << endl;
+        }
+    }
+
+    void printAllBooks() {
+        if (head == nullptr) {
+            cout << "No books in the library." << endl;
+            return;
+        }
+
+        BookNode* current = head;
+        while (current != nullptr) {
+            cout << "ID: " << current->id << ", Title: " << current->title
+                 << ", Author: " << current->author << endl;
+            current = current->next;
+        }
+    }
+};
+
+int main() {
+    Library library;
+
+    library.addBook(1, "The Great Gatsby", "F. Scott Fitzgerald");
+    library.addBook(2, "To Kill a Mockingbird", "Harper Lee");
+    library.addBook(3, "1984", "George Orwell");
+
+    cout << "\nAll books in the library:" << endl;
+    library.printAllBooks();
+
+    library.removeBook("To Kill a Mockingbird");
+
+    cout << "\nAll books in the library after removal:" << endl;
+    library.printAllBooks();
+
+    library.searchBookByAuthor("George Orwell");
+    library.searchBookByAuthor("J.K. Rowling");
+
+    return 0;
+}
+
+
+// Browser History: Implement a stack to manage a web browser's history. Each entry should store the URL of a visited page. Implement functions to:
+//    - Visit a new URL (push).
+//    - Go back to the previous URL (pop).
+//    - View the current URL (peek).
+//    - Display all URLs in the history.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Node
+{
+public:
+    string url;
+    Node *next;
+    Node *prev;
+
+    Node(string u) : url(u), next(nullptr), prev(nullptr) {}
+};
+
+class BrowserHistory
+{
+private:
+    Node *top;
+
+public:
+    BrowserHistory() : top(nullptr) {}
+
+    void visit(string url)
+    {
+        Node *newNode = new Node(url);
+        if (top)
+        {
+            newNode->prev = top;
+            top->next = newNode;
+        }
+        top = newNode;
+        cout << "Visited: " << url << endl;
+    }
+
+    void goBack()
+    {
+        if (!top)
+        {
+            cout << "No history to go back to.\n";
+            return;
+        }
+        cout << "Going back from: " << top->url << endl;
+        Node *temp = top;
+        top = top->prev;
+        if (top)
+        {
+            top->next = nullptr;
+        }
+        delete temp;
+    }
+
+    void viewCurrent()
+    {
+        if (!top)
+        {
+            cout << "No current URL.\n";
+        }
+        else
+        {
+            cout << "Current URL: " << top->url << endl;
+        }
+    }
+
+    void displayHistory()
+    {
+        Node *current = top;
+        while (current)
+        {
+            cout << current->url << endl;
+            current = current->prev;
+        }
+    }
+};
+
+int main()
+{
+    BrowserHistory history;
+    history.visit("http://example.com");
+    history.visit("http://google.com");
+    history.visit("http://stackoverflow.com");
+
+    history.viewCurrent();
+    history.goBack();
+    history.viewCurrent();
+    history.displayHistory();
+
+    return 0;
+}
+
+// array stack implementation
+#include <iostream>
+#include <string>
+using namespace std;
+
+class ArrayStack {
+private:
+    static const int MAX_SIZE = 100;
+    string stack[MAX_SIZE];
+    int top;
+
+public:
+    ArrayStack() : top(-1) {}
+
+    bool isFull() {
+        return top == MAX_SIZE - 1;
+    }
+
+    bool isEmpty() {
+        return top == -1;
+    }
+
+    void push(string url) {
+        if (isFull()) {
+            cout << "Stack is full. Cannot push URL: " << url << endl;
+            return;
+        }
+        stack[++top] = url;
+    }
+
+    string pop() {
+        if (isEmpty()) {
+            cout << "Stack is empty. Cannot pop." << endl;
+            return "";
+        }
+        return stack[top--];
+    }
+
+    string peek() {
+        if (isEmpty()) {
+            cout << "Stack is empty." << endl;
+            return "";
+        }
+        return stack[top];
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "Stack is empty." << endl;
+            return;
+        }
+        for (int i = 0; i <= top; ++i) {
+            cout << stack[i] << endl;
+        }
+    }
+};
+
+int main() {
+    ArrayStack browserHistory;
+
+    browserHistory.push("http://example.com");
+    browserHistory.push("http://example.com/page1");
+    browserHistory.push("http://example.com/page2");
+
+    cout << "Current URL: " << browserHistory.peek() << endl;
+
+    browserHistory.pop();
+
+    cout << "Current URL after going back: " << browserHistory.peek() << endl;
+
+    cout << "All URLs in history:" << endl;
+    browserHistory.display();
+
+    return 0;
+}
+
+
+ // Undo Functionality in Text Editor: Use a stack to implement undo functionality in a text editor. Each operation (insert, delete) should be stored in the stack. Implement functions to:
+ //   - Record an operation (push).
+ //   - Undo the last operation (pop).
+ //   - Display the current state of the text.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Operation
+{
+public:
+    string type;
+    string content;
+    int position;
+    Operation *next;
+    Operation *prev;
+
+    Operation(string t, string c, int p) : type(t), content(c), position(p), next(nullptr), prev(nullptr) {}
+};
+
+class TextEditor
+{
+private:
+    Operation *top;
+    string text;
+
+public:
+    TextEditor() : top(nullptr) {}
+
+    void recordOperation(string type, string content, int position)
+    {
+        Operation *newOp = new Operation(type, content, position);
+        if (top)
+        {
+            newOp->prev = top;
+            top->next = newOp;
+        }
+        top = newOp;
+    }
+
+    void insertText(string content, int position)
+    {
+        text.insert(position, content);
+        recordOperation("insert", content, position);
+    }
+
+    void deleteText(int position, int length)
+    {
+        string deletedText = text.substr(position, length);
+        text.erase(position, length);
+        recordOperation("delete", deletedText, position);
+    }
+
+    void undo()
+    {
+        if (!top)
+        {
+            cout << "Nothing to undo.\n";
+            return;
+        }
+        Operation *temp = top;
+        if (temp->type == "insert")
+        {
+            text.erase(temp->position, temp->content.length());
+        }
+        else if (temp->type == "delete")
+        {
+            text.insert(temp->position, temp->content);
+        }
+        top = top->prev;
+        if (top)
+        {
+            top->next = nullptr;
+        }
+        delete temp;
+    }
+
+    void displayText()
+    {
+        cout << "Current Text: " << text << endl;
+    }
+};
+
+int main()
+{
+    TextEditor editor;
+    editor.insertText("Hello", 0);
+    editor.insertText(" World", 5);
+    editor.displayText();
+
+    editor.deleteText(5, 6);
+    editor.displayText();
+
+    editor.undo();
+    editor.displayText();
+
+    editor.undo();
+    editor.displayText();
+
+    return 0;
+}
+
+// Arithmetic Expression Evaluation: Implement a stack-based solution to evaluate arithmetic expressions in postfix notation. Each token can be an operator (+, -, *, /) or an operand (number). Implement functions to:
+//    - Push operands onto the stack.
+//    - Perform operations using stack elements.
+//    - Return the result of the expression.
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+class OperandNode {
+public:
+    double value;
+    OperandNode* next;
+    OperandNode* prev;
+
+    OperandNode(double v) : value(v), next(nullptr), prev(nullptr) {}
+};
+
+class ExpressionEvaluator {
+private:
+    OperandNode* top;
+
+public:
+    ExpressionEvaluator() : top(nullptr) {}
+
+    void push(double value) {
+        OperandNode* newNode = new OperandNode(value);
+        if (top) {
+            newNode->prev = top;
+            top->next = newNode;
+        }
+        top = newNode;
+    }
+
+    double pop() {
+        if (!top) {
+            throw runtime_error("Stack underflow");
+        }
+        OperandNode* temp = top;
+        double value = temp->value;
+        top = top->prev;
+        if (top) {
+            top->next = nullptr;
+        }
+        delete temp;
+        return value;
+    }
+
+    double evaluatePostfix(const char* expression) {
+        char* token = strtok(const_cast<char*>(expression), " ");
+        while (token != nullptr) {
+            if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
+                push(atof(token));
+            } else {
+                double operand2 = pop();
+                double operand1 = pop();
+                if (strcmp(token, "+") == 0) {
+                    push(operand1 + operand2);
+                } else if (strcmp(token, "-") == 0) {
+                    push(operand1 - operand2);
+                } else if (strcmp(token, "*") == 0) {
+                    push(operand1 * operand2);
+                } else if (strcmp(token, "/") == 0) {
+                    push(operand1 / operand2);
+                }
+            }
+            token = strtok(nullptr, " ");
+        }
+        return pop();
+    }
+};
+
+int main() {
+    ExpressionEvaluator evaluator;
+    char expression[] = "3 4 + 2 * 7 /";
+    cout << "Postfix Expression: " << expression << endl;
+    double result = evaluator.evaluatePostfix(expression);
+    cout << "Result: " << result << endl;
+
+    return 0;
+}
+
+// Ticket Booking System: Implement a queue to manage ticket bookings for an event. Each node should store booking ID, customer name, and number of tickets. Implement functions to:
+//    - Add a new booking to the queue.
+//    - Serve the next booking (dequeue).
+//    - Display all bookings in the queue.
+//    - Count the total number of bookings.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class BookingNode {
+public:
+    int bookingID;
+    string customerName;
+    int numberOfTickets;
+    BookingNode* next;
+
+    BookingNode(int id, string name, int tickets)
+        : bookingID(id), customerName(name), numberOfTickets(tickets), next(nullptr) {}
+};
+
+class TicketBookingQueue {
+private:
+    BookingNode* front;
+    BookingNode* rear;
+    int count;
+
+public:
+    TicketBookingQueue() : front(nullptr), rear(nullptr), count(0) {}
+
+    void addBooking(int id, string name, int tickets) {
+        BookingNode* newNode = new BookingNode(id, name, tickets);
+        if (rear) {
+            rear->next = newNode;
+        } else {
+            front = newNode;
+        }
+        rear = newNode;
+        count++;
+        cout << "Booking added successfully\n";
+    }
+
+    void serveBooking() {
+        if (!front) {
+            cout << "No bookings to serve\n";
+            return;
+        }
+        BookingNode* temp = front;
+        front = front->next;
+        if (!front) {
+            rear = nullptr;
+        }
+        cout << "Served booking ID: " << temp->bookingID << endl;
+        delete temp;
+        count--;
+    }
+
+    void displayBookings() {
+        BookingNode* current = front;
+        while (current) {
+            cout << "Booking ID: " << current->bookingID << ", Name: " << current->customerName << ", Tickets: " << current->numberOfTickets << endl;
+            current = current->next;
+        }
+    }
+
+    int getTotalBookings() {
+        return count;
+    }
+};
+
+int main() {
+    TicketBookingQueue queue;
+    queue.addBooking(1, "Alice", 2);
+    queue.addBooking(2, "Bob", 4);
+    queue.addBooking(3, "Charlie", 1);
+
+    queue.displayBookings();
+    cout << "Total bookings: " << queue.getTotalBookings() << endl;
+
+    queue.serveBooking();
+    queue.displayBookings();
+    cout << "Total bookings: " << queue.getTotalBookings() << endl;
+
+    return 0;
+}
+
+
+// 2. Printer Job Scheduling: Use a queue to manage print jobs in a printer. Each job should store job ID, document name, and number of pages. Implement functions to:
+//    - Add a new print job to the queue.
+//    - Serve the next print job (dequeue).
+//    - Display all pending print jobs.
+//    - Check if the queue is empty.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class PrintJobNode {
+public:
+    int jobID;
+    string documentName;
+    int numberOfPages;
+    PrintJobNode* next;
+
+    PrintJobNode(int id, string docName, int pages)
+        : jobID(id), documentName(docName), numberOfPages(pages), next(nullptr) {}
+};
+
+class PrinterJobQueue {
+private:
+    PrintJobNode* front;
+    PrintJobNode* rear;
+
+public:
+    PrinterJobQueue() : front(nullptr), rear(nullptr) {}
+
+    void addPrintJob(int id, string docName, int pages) {
+        PrintJobNode* newNode = new PrintJobNode(id, docName, pages);
+        if (rear) {
+            rear->next = newNode;
+        } else {
+            front = newNode;
+        }
+        rear = newNode;
+        cout << "Print job added successfully\n";
+    }
+
+    void servePrintJob() {
+        if (!front) {
+            cout << "No print jobs to serve\n";
+            return;
+        }
+        PrintJobNode* temp = front;
+        front = front->next;
+        if (!front) {
+            rear = nullptr;
+        }
+        cout << "Served print job ID: " << temp->jobID << endl;
+        delete temp;
+    }
+
+    void displayPrintJobs() {
+        PrintJobNode* current = front;
+        while (current) {
+            cout << "Job ID: " << current->jobID << ", Document: " << current->documentName << ", Pages: " << current->numberOfPages << endl;
+            current = current->next;
+        }
+    }
+
+    bool isEmpty() {
+        return front == nullptr;
+    }
+};
+
+int main() {
+    PrinterJobQueue queue;
+    queue.addPrintJob(1, "Doc1", 10);
+    queue.addPrintJob(2, "Doc2", 5);
+    queue.addPrintJob(3, "Doc3", 15);
+
+    queue.displayPrintJobs();
+
+    queue.servePrintJob();
+    queue.displayPrintJobs();
+
+    cout << "Is queue empty: " << (queue.isEmpty() ? "Yes" : "No") << endl;
+
+    return 0;
+}
+
+// circular queue implementation
+#include <iostream>
+#include <string>
+using namespace std;
+
+class CircularQueue {
+private:
+    static const int MAX_SIZE = 100;
+    struct Job {
+        int jobID;
+        string documentName;
+        int numberOfPages;
+    } queue[MAX_SIZE];
+
+    int front;
+    int rear;
+    int count;
+
+public:
+    CircularQueue() : front(0), rear(0), count(0) {}
+
+    bool isFull() {
+        return count == MAX_SIZE;
+    }
+
+    bool isEmpty() {
+        return count == 0;
+    }
+
+    void enqueue(int jobID, string documentName, int numberOfPages) {
+        if (isFull()) {
+            cout << "Queue is full. Cannot add job: " << documentName << endl;
+            return;
+        }
+        queue[rear].jobID = jobID;
+        queue[rear].documentName = documentName;
+        queue[rear].numberOfPages = numberOfPages;
+        rear = (rear + 1) % MAX_SIZE;
+        count++;
+    }
+
+    Job dequeue() {
+        if (isEmpty()) {
+            cout << "Queue is empty. Cannot dequeue." << endl;
+            return {0, "", 0};
+        }
+        Job job = queue[front];
+        front = (front + 1) % MAX_SIZE;
+        count--;
+        return job;
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "Queue is empty." << endl;
+            return;
+        }
+        int i = front;
+        int c = count;
+        while (c > 0) {
+            cout << "Job ID: " << queue[i].jobID
+                 << ", Document Name: " << queue[i].documentName
+                 << ", Number of Pages: " << queue[i].numberOfPages << endl;
+            i = (i + 1) % MAX_SIZE;
+            c--;
+        }
+    }
+
+    int getSize() {
+        return count;
+    }
+};
+
+int main() {
+    CircularQueue printerQueue;
+
+    printerQueue.enqueue(1, "Document1", 10);
+    printerQueue.enqueue(2, "Document2", 5);
+    printerQueue.enqueue(3, "Document3", 15);
+
+    cout << "All print jobs in the queue:" << endl;
+    printerQueue.display();
+
+    CircularQueue::Job job = printerQueue.dequeue();
+    cout << "Serving job: " << job.documentName << endl;
+
+    cout << "All print jobs in the queue after serving one job:" << endl;
+    printerQueue.display();
+
+    return 0;
+}
+
+
+// 3. Customer Service System: Create a queue to manage customer service requests. Each request should store request ID, customer name, and issue description. Implement functions to:
+//    - Add a new service request to the queue.
+//    - Serve the next service request (dequeue).
+//    - Display all pending service requests.
+//    - Find and display a service request by customer name.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class ServiceRequestNode {
+public:
+    int requestID;
+    string customerName;
+    string issueDescription;
+    ServiceRequestNode* next;
+
+    ServiceRequestNode(int id, string name, string issue)
+        : requestID(id), customerName(name), issueDescription(issue), next(nullptr) {}
+};
+
+class CustomerServiceQueue {
+private:
+    ServiceRequestNode* front;
+    ServiceRequestNode* rear;
+
+public:
+    CustomerServiceQueue() : front(nullptr), rear(nullptr) {}
+
+    void addServiceRequest(int id, string name, string issue) {
+        ServiceRequestNode* newNode = new ServiceRequestNode(id, name, issue);
+        if (rear) {
+            rear->next = newNode;
+        } else {
+            front = newNode;
+        }
+        rear = newNode;
+        cout << "Service request added successfully\n";
+    }
+
+    void serveServiceRequest() {
+        if (!front) {
+            cout << "No service requests to serve\n";
+            return;
+        }
+        ServiceRequestNode* temp = front;
+        front = front->next;
+        if (!front) {
+            rear = nullptr;
+        }
+        cout << "Served request ID: " << temp->requestID << endl;
+        delete temp;
+    }
+
+    void displayServiceRequests() {
+        ServiceRequestNode* current = front;
+        while (current) {
+            cout << "Request ID: " << current->requestID << ", Name: " << current->customerName << ", Issue: " << current->issueDescription << endl;
+            current = current->next;
+        }
+    }
+
+    void findServiceRequestByName(const string& name) {
+        ServiceRequestNode* current = front;
+        while (current) {
+            if (current->customerName == name) {
+                cout << "Request ID: " << current->requestID << ", Name: " << current->customerName << ", Issue: " << current->issueDescription << endl;
+                return;
+            }
+            current = current->next;
+        }
+        cout << "Service request for customer " << name << " not found\n";
+    }
+};
+
+int main() {
+    CustomerServiceQueue queue;
+    queue.addServiceRequest(1, "Alice", "Cannot login");
+    queue.addServiceRequest(2, "Bob", "Error in payment");
+    queue.addServiceRequest(3, "Charlie", "Account suspended");
+
+    queue.displayServiceRequests();
+
+    queue.serveServiceRequest();
+    queue.displayServiceRequests();
+
+    queue.findServiceRequestByName("Bob");
+
+    return 0;
 }
