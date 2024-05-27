@@ -1,3 +1,168 @@
+// final 1
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+class LinkedList {
+public:
+    Node* head;
+
+    LinkedList() : head(nullptr) {}
+
+    void append(int data) {
+        if (!head) {
+            head = new Node(data);
+            return;
+        }
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = new Node(data);
+    }
+
+    void printList() {
+        Node* current = head;
+        while (current) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+
+    void InsertBeforeEnd(int data1, int data2) {
+        if (!head || !head->next || !head->next->next) {
+            cout << "List is too short to perform the insertion." << endl;
+            return;
+        }
+
+        Node* current = head;
+
+        while (current->next->next->next) {
+            current = current->next;
+        }
+
+        Node* firstNewNode = new Node(data1);
+        Node* secondNewNode = new Node(data2);
+
+        firstNewNode->next = current->next;
+        current->next = firstNewNode;
+        
+        secondNewNode->next = firstNewNode->next;
+        firstNewNode->next = secondNewNode;
+    }
+};
+
+int main() {
+    LinkedList list;
+    list.append(1);
+    list.append(2);
+    list.append(3);
+    list.append(4);
+    list.append(5);
+
+    cout << "Original List: ";
+    list.printList();
+
+    list.InsertBeforeEnd(6, 7);
+
+    cout << "Modified List: ";
+    list.printList();
+
+    return 0;
+}
+
+
+// final 2
+
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+class LinkedList {
+public:
+    Node* head;
+
+    LinkedList() : head(nullptr) {}
+
+    void append(int data) {
+        if (!head) {
+            head = new Node(data);
+            return;
+        }
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = new Node(data);
+    }
+
+    void printList() {
+        Node* current = head;
+        while (current) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+
+    void InsertBeforeEnd(int data1, int data2) {
+        if (!head || !head->next || !head->next->next) {
+            cout << "List is too short to perform the insertion." << endl;
+            return;
+        }
+
+        Node* current = head;
+
+        while (current->next->next->next) {
+            current = current->next;
+        }
+
+        Node* firstNewNode = new Node(data1);
+        Node* secondNewNode = new Node(data2);
+
+        firstNewNode->next = current->next;
+        current->next = firstNewNode;
+        
+        secondNewNode->next = firstNewNode->next;
+        firstNewNode->next = secondNewNode;
+    }
+};
+
+int main() {
+    LinkedList list;
+    list.append(1);
+    list.append(2);
+    list.append(3);
+    list.append(4);
+    list.append(5);
+
+    cout << "Original List: ";
+    list.printList();
+
+    list.InsertBeforeEnd(6, 7);
+
+    cout << "Modified List: ";
+    list.printList();
+
+    return 0;
+}
+
+
 // Write a C++ function remove_duplicates(), this function will take a doubly linked list as input and checks if there is any duplication in the doubly linked list, if there is any, it should keep the first occurrence and remove the second one. (15 Marks)
 
 // For example: Input double linked list is: 1<>3<>5<>1<>6<>7<>6<>9
